@@ -16,14 +16,10 @@ class ClientFinder:
         return self._client
 
 
-class Ec2Client(ClientFinder):
+class AWSClient(ClientFinder):
     def __init__(self, client_name, region='ca-central-1'):
         super().__init__(client_name, region)
 
-
-class ELBClient(ClientFinder):
-    def __init__(self, client, region='ca-central-1'):
-        self._client = boto3.client(client, region)
 
 # ============================================================
 # EC2 class for creating EC2 instance with generic functions
@@ -36,7 +32,6 @@ class EC2:
     def create_key_pair(self, key_name):
         kp_describe = self._client.describe_key_pairs()
         keypairs = kp_describe.get('KeyPairs')
-        print('keypairs', keypairs)
         for keypair in keypairs:
             if key_name == keypair['KeyName']:
                 return keypair
@@ -44,7 +39,7 @@ class EC2:
                                      TagSpecifications=[{'ResourceType': 'key-pair',
                                                          'Tags': [{'Key': 'name', 'Value': 'hello-world-service'}]
                                                          }])
-        pprint(kp_response['KeyMaterial'])
+        print("Private Key:", kp_response['KeyMaterial'])
         return kp_response
 
     def create_security_group(self, group_name, description, vpc_id):
@@ -193,19 +188,18 @@ class VPC:
 # DELETING AWS INFRASTRUCTURE
 # ============================================================
 
-def delete_loadbalancers(aws):
+def deletingInfrastructure(aws):
+    ec2_client = AWSClient('ec2').get_client()
     if aws.get('elb_response'):
-        elb_client = ELBClient('elbv2').get_client()
+        elb_client = AWSClient('elbv2').get_client()
         elb_client.delete_load_balancer(LoadBalancerArn=aws.get('lb_arn'))
         if aws.get('target_arn'):
             elb_client.deregister_targets(TargetGroupArn=aws.get('target_arn'),
-                                          Targets=[{'Id':aws.get('instanceId')}])
+                                          Targets=[{'Id': aws.get('instanceId')}])
             elb_client.delete_target_group(TargetGroupArn=aws.get('target_arn'))
             pprint("Load Balancer Target Group deleted")
         pprint("Load Balancer deleted")
 
-
-def delete_instances(ec2_client, aws):
     if aws.get('instances'):
         ec2_client.terminate_instances(InstanceIds=[aws.get('instanceId')])
         ec2_waiter = ec2_client.get_waiter('instance_terminated')
@@ -214,8 +208,6 @@ def delete_instances(ec2_client, aws):
         ec2_client.delete_key_pair(KeyName='WebInfra-KeyPair')
         pprint("EC2 Instance Terminated")
 
-
-def delete_vpc(ec2_client, aws):
     if aws.get('vpc_response'):
         if aws.get('subnet1'):
             ec2_client.delete_subnet(SubnetId=aws.get('subnet1'))
@@ -226,19 +218,12 @@ def delete_vpc(ec2_client, aws):
         if aws.get('security_group_lb'):
             ec2_client.delete_security_group(GroupId=aws.get('security_group_lb'))
         if aws.get('IGW'):
-            ec2_client.detach_internet_gateway(InternetGatewayId=aws.get('IGW'),VpcId=aws.get('VpcId'))
+            ec2_client.detach_internet_gateway(InternetGatewayId=aws.get('IGW'), VpcId=aws.get('VpcId'))
             ec2_client.delete_internet_gateway(InternetGatewayId=aws.get('IGW'))
         if aws.get('route'):
             ec2_client.delete_route_table(RouteTableId=aws.get('route'))
         ec2_client.delete_vpc(VpcId=aws.get('VpcId'))
         pprint("VPC Deleted")
-
-
-def deletingInfrastructure(aws):
-    ec2_client = Ec2Client('ec2').get_client()
-    delete_loadbalancers(aws)
-    delete_instances(ec2_client, aws)
-    delete_vpc(ec2_client, aws)
 
 
 # ============================================================
@@ -247,11 +232,11 @@ def deletingInfrastructure(aws):
 
 def main(ec2_ami_id, vpc_name, kp_name):
 
-    # Collecting all necessary objects to delete later if any error occured
+    # Collecting all necessary objects to delete later if any error occurred
     aws_infrastructure = {}
     try:
         # Create a VPC
-        ec2_client = Ec2Client('ec2').get_client()
+        ec2_client = AWSClient('ec2').get_client()
         vpc = VPC(ec2_client)
 
         vpc_response = vpc.create_vpc(vpc_name)
@@ -371,7 +356,7 @@ def main(ec2_ami_id, vpc_name, kp_name):
         pprint("EC2 instance is running")
 
         # Creating Elastic Load Balancer
-        elb_client = ELBClient('elbv2').get_client()
+        elb_client = AWSClient('elbv2').get_client()
 
         elb_response = elb_client.create_load_balancer(Name="elbHelloService", Type='application',
                                                        Subnets=[public_subnet1_id, public_subnet2_id],
