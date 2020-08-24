@@ -6,6 +6,10 @@ The following script can be written in modular approach as best coding practice
 
 Application created and available at:  http://elbhelloservice-1649805918.ca-central-1.elb.amazonaws.com/
 
+# Architecture 
+
+![](Architecture.png)
+
 # Workflow
 
 1. Created **ClientFinder** class as base and child class **Ec2Client** and **ELBClient** using inheritence
