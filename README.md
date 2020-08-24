@@ -18,8 +18,8 @@ Application created and available at:  http://elbhelloservice-1649805918.ca-cent
 
 # Execution steps
 
-1. run command **chmod u+x createWebInfra.py**
-2. navigate to AutomateInfrastructure folder and run **./createWebInfra.py**
+1. Run command **chmod u+x createWebInfra.py**
+2. Navigate to AutomateInfrastructure folder and run **./createWebInfra.py**
 
 # Materials
 
