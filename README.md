@@ -32,3 +32,7 @@ Application created and available at:  http://elbhelloservice-1649805918.ca-cent
 2. https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#waiters
 
 3. https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/elbv2.html#client
+
+# Blog
+
+https://blog.arunprabhu.tech/2020/08/automating-aws-infrastructure-ec2-load.html
