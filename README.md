@@ -22,6 +22,8 @@ Application created and available at:  http://elbhelloservice-1649805918.ca-cent
 
 # Execution steps
 
+1. Used Pycharm and added **aws_access_key_id** and **aws_secret_access_key** in **~/.aws/credentials** 
+   with region **ca-central-1** using aws cli
 1. Run command **chmod u+x createWebInfra.py**
 2. Navigate to AutomateInfrastructure folder and run **./createWebInfra.py**
 
