@@ -1,7 +1,7 @@
 ### Automating AWS Infrastructure (ec2 + load balancer) using python Boto3
 
 #
-As mentioned in coding exercise, the **createWebInfra.py** script when executed will create **AWS Infrastructure** with **load balancer and ec2 instance created with nginx server**
+The **createWebInfra.py** script when executed will create **AWS Infrastructure** with **load balancer and ec2 instance created with nginx server**
 The following script can be written in modular approach as best coding practice
 
 Application created and available at:  http://elbhelloservice-1649805918.ca-central-1.elb.amazonaws.com/
